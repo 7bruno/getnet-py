@@ -2,6 +2,9 @@ from typing import Union
 from uuid import UUID
 
 from getnet.services.payments import Customer
+from getnet.services.payments import OrderItem
+from getnet.services.payments.marketplace_subseller import MarketplaceSubseller
+
 from getnet.services.payments.credit.credit import Credit
 from getnet.services.payments.credit.credit_cancel import CreditCancelPaymentResponse
 from getnet.services.payments.credit.credit_response import CreditPaymentResponse
@@ -10,7 +13,7 @@ from getnet.services.service import Service
 from getnet.services.utils import Device
 
 
-class Service(Service):
+class CreditPaymentService(Service):
     path = "/v1/payments/credit"
 
     def create(
@@ -27,8 +30,9 @@ class Service(Service):
             "amount": amount,
             "currency": currency,
             "order": order.as_dict(),
-            "credit": credit.as_dict(),
             "customer": customer.as_dict(),
+            "credit": credit.as_dict(),
+
         }
 
         if device is not None:
@@ -39,6 +43,40 @@ class Service(Service):
 
     def cancel(self, payment_id: Union[UUID, str]) -> CreditCancelPaymentResponse:
         response = self._post(
-            self._format_url(path="/{payment_id}/cancel", payment_id=str(payment_id))
+            self._format_url(path="/{payment_id}/cancel",
+                             payment_id=str(payment_id))
         )
         return CreditCancelPaymentResponse(**response)
+
+    def marketplaceCreate(
+        self,
+        marketplace_subseller_payments: list,
+        amount: int,
+        order: Order,
+        customer: Customer,
+        credit: Credit,
+        currency: str = "BRL",
+        device: Device = None
+    ):
+
+        data = {
+            "seller_id": self._client.seller_id,
+            "amount": amount,
+            "currency": currency,
+            "order": order.as_dict(),
+            "customer": customer.as_dict(),
+            "credit": credit.as_dict()
+        }
+
+        if marketplace_subseller_payments is not None:
+
+            data["marketplace_subseller_payments"] = marketplace_subseller_payments
+
+        if device is not None:
+            data["device"] = device.as_dict()
+
+        print(data)
+
+        response = self._post(self._format_url(), json=data)
+
+        return CreditPaymentResponse(**response)

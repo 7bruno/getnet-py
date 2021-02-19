@@ -1,2 +1,2 @@
-from .service import Service, Credit
+from .service import CreditPaymentService, Credit
 from .card import Card

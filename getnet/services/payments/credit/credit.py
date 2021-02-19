@@ -42,7 +42,8 @@ class Credit:
         if soft_descriptor is not None and len(soft_descriptor) > 22:
             raise TypeError("soft_descriptor is too long (max: 23 characters)")
 
-        self.card = card if isinstance(card, Card) or card is None else Card(**card)
+        self.card = card if isinstance(
+            card, Card) or card is None else Card(**card)
         self.delayed = delayed
         self.authenticated = authenticated
         self.pre_authorization = pre_authorization

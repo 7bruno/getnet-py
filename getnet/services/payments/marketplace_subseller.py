@@ -11,7 +11,7 @@ class MarketplaceSubseller:
 
     def add_order_item(self, order_item: OrderItem):
 
-        self.order_items.append(order_item)
+        self.order_items.append(order_item.as_dict())
 
     def as_dict(self):
 
