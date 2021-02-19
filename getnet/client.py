@@ -81,6 +81,7 @@ class Client(object):
                 data=data,
                 auth=HTTPBasicAuth(self.client_id, self.client_secret),
             )
+
             if not response.ok:
                 raise handler_request_exception(response)
 
