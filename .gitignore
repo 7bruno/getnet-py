@@ -16,6 +16,8 @@ build/
 dist/
 .tox/
 .env
+venv/
+main.py
 
 .workon
 .*/

@@ -1,7 +1,7 @@
 import logging
 from datetime import datetime, timedelta
 from typing import Union
-
+from requests.auth import HTTPBasicAuth
 import requests
 
 from getnet.environment import Environment
@@ -79,7 +79,7 @@ class Client(object):
             response = self.request.post(
                 self.base_url + path,
                 data=data,
-                auth=(self.client_id, self.client_secret),
+                auth=HTTPBasicAuth(self.client_id, self.client_secret),
             )
             if not response.ok:
                 raise handler_request_exception(response)
