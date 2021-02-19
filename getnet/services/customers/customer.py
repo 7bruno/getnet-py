@@ -64,5 +64,6 @@ class Customer:
 
     def as_dict(self):
         data = self.__dict__.copy()
-        data["address"] = self.address.as_dict()
+        data["address"] = self.address.as_dict(
+        ) if data["address"] is not None else None
         return data
