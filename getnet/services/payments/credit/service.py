@@ -89,12 +89,10 @@ class CreditPaymentService(Service):
             "first_name": data["customer"]["first_name"],
             "name": f'{data["customer"]["first_name"]} {data["customer"]["last_name"]}',
             "email":data["customer"]["email"],
-            "celphone_number":cellphone,
+            "phone_number":cellphone,
             "shipping_amount": 0,
             "address":data["customer"]["billing_address"]
         }]
-
-        print(data)
 
         response = self._post(self._format_url(), json=data)
 
