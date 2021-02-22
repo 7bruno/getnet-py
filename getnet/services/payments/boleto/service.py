@@ -63,6 +63,8 @@ class BoletoService(Service):
         data["customer"].setdefault(
             "name", f'{data["customer"]["first_name"]} {data["customer"]["last_name"]}')
 
+        data["customer"].pop("last_name")
+
         data["boleto"].pop("our_number")
 
         print(data)

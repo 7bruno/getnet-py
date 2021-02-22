@@ -4,6 +4,7 @@ from uuid import UUID
 from getnet.services.payments import Customer
 from getnet.services.payments import OrderItem
 from getnet.services.payments.marketplace_subseller import MarketplaceSubseller
+from getnet.services.payments.credit.delayed import DelayedResponse
 
 from getnet.services.payments.credit.credit import Credit
 from getnet.services.payments.credit.credit_cancel import CreditCancelPaymentResponse
@@ -97,3 +98,18 @@ class CreditPaymentService(Service):
         response = self._post(self._format_url(), json=data)
 
         return CreditPaymentResponse(**response)
+
+    def delayed(self, payment_id: Union[UUID, str], amount: int, marketplace_subseller_payments: list = None):
+
+        data = {
+            "amount": amount,
+        }
+
+        if marketplace_subseller_payments:
+
+            data["marketplace_subseller_payments"] = marketplace_subseller_payments
+
+        response = self._post(self._format_url() +
+                              f'/{payment_id}/confirm', json=data)
+
+        return DelayedResponse(**response)
