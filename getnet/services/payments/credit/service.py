@@ -48,7 +48,7 @@ class CreditPaymentService(Service):
         )
         return CreditCancelPaymentResponse(**response)
 
-    def marketplaceCreate(
+    def marketplaceCreditCreate(
         self,
         marketplace_subseller_payments: list,
         amount: int,
