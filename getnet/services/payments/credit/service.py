@@ -75,6 +75,25 @@ class CreditPaymentService(Service):
         if device is not None:
             data["device"] = device.as_dict()
 
+        data["credit"].pop("authenticated")
+        data["customer"]["billing_address"] = data["customer"].pop("address")
+        data["customer"].pop("observation")
+        phone = data["customer"].pop("phone_number")
+        cellphone = data["customer"].pop("celphone_number")
+        data["customer"].pop("seller_id")
+        data["customer"].pop("birth_date")
+        data["customer"].setdefault(
+            "name", f'{data["customer"]["first_name"]} {data["customer"]["last_name"]}')
+
+        data["shippings"] = [{
+            "first_name": data["customer"]["first_name"],
+            "name": f'{data["customer"]["first_name"]} {data["customer"]["last_name"]}',
+            "email":data["customer"]["email"],
+            "celphone_number":cellphone,
+            "shipping_amount": 0,
+            "address":data["customer"]["billing_address"]
+        }]
+
         print(data)
 
         response = self._post(self._format_url(), json=data)
