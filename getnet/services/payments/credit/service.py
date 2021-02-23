@@ -113,3 +113,19 @@ class CreditPaymentService(Service):
                               f'/{payment_id}/confirm', json=data)
 
         return DelayedResponse(**response)
+
+    def delayedAdjust(self, payment_id: Union[UUID, str], amount: int, currency: str = "BRL", marketplace_subseller_payments: list = None):
+
+        data = {
+            "amount": amount,
+            "currency": currency
+        }
+
+        if marketplace_subseller_payments:
+
+            data["marketplace_subseller_payments"] = marketplace_subseller_payments
+
+        response = self._post(self._format_url() +
+                              f'/{payment_id}/adjustment', json=data)
+
+        return DelayedAdjustResponse(**response)

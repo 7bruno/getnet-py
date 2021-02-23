@@ -67,7 +67,5 @@ class BoletoService(Service):
 
         data["boleto"].pop("our_number")
 
-        print(data)
-
         response = self._post(self._format_url(), json=data)
         return BoletoPaymentResponse(_base_uri=self._client.base_url, **response)
