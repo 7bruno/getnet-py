@@ -10,11 +10,16 @@ class Service(BaseService):
 
     path = "/v1/tokens/card"
 
-    def generate(self, card: CardNumber):
+    def generate(self, card: CardNumber, **kwargs):
         """Generate an token for the card data
 
         Args:
             card (CardNumber):
         """
         response = self._post(self.path, json=card.as_dict())
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](card.as_dict(), response, self.path)
+
         return CardToken(response.get("number_token"))

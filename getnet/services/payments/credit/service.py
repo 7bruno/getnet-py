@@ -57,7 +57,8 @@ class CreditPaymentService(Service):
         customer: Customer,
         credit: Credit,
         currency: str = "BRL",
-        device: Device = None
+        device: Device = None,
+        **kwargs
     ):
 
         data = {
@@ -97,9 +98,13 @@ class CreditPaymentService(Service):
 
         response = self._post(self._format_url(), json=data)
 
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](data, response, self._format_url())
+
         return CreditPaymentResponse(**response)
 
-    def delayed(self, payment_id: Union[UUID, str], amount: int, marketplace_subseller_payments: list = None):
+    def delayed(self, payment_id: Union[UUID, str], amount: int, marketplace_subseller_payments: list = None, **kwargs):
 
         data = {
             "amount": amount,
@@ -112,9 +117,14 @@ class CreditPaymentService(Service):
         response = self._post(self._format_url() +
                               f'/{payment_id}/confirm', json=data)
 
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](data, response, self._format_url() +
+                               f'/{payment_id}/confirm')
+
         return DelayedResponse(**response)
 
-    def delayedAdjust(self, payment_id: Union[UUID, str], amount: int, currency: str = "BRL", marketplace_subseller_payments: list = None):
+    def delayedAdjust(self, payment_id: Union[UUID, str], amount: int, currency: str = "BRL", marketplace_subseller_payments: list = None, **kwargs):
 
         data = {
             "amount": amount,
@@ -127,5 +137,10 @@ class CreditPaymentService(Service):
 
         response = self._post(self._format_url() +
                               f'/{payment_id}/adjustment', json=data)
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](data, response, self._format_url() +
+                               f'/{payment_id}/adjustment')
 
         return DelayedAdjustResponse(**response)

@@ -18,6 +18,7 @@ class Service(Service):
         retries: int = None,
         sort: str = "create_date",
         sort_type: str = "asc",
+        **kwargs,
     ) -> ResponseList:
         if page <= 0:
             raise TypeError("page must be greater then 0")
@@ -41,8 +42,16 @@ class Service(Service):
 
         response = self._get(self._format_url(), params=params)
 
-        values = [ChargeResponse(**charge) for charge in response.get("charges")]
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](None, response, self._format_url())
+
+        return CreditPaymentResponse(**response)
+
+        values = [ChargeResponse(**charge)
+                  for charge in response.get("charges")]
 
         return ResponseList(
-            values, response.get("page"), response.get("limit"), response.get("total")
+            values, response.get("page"), response.get(
+                "limit"), response.get("total")
         )

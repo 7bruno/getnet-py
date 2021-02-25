@@ -19,7 +19,7 @@ class Service(BaseService):
 
     path = "/v1/cards/{card_id}"
 
-    def verify(self, card: Card) -> bool:
+    def verify(self, card: Card, **kwargs) -> bool:
         """Checks if the card is valid
 
         Args:
@@ -28,15 +28,26 @@ class Service(BaseService):
         response = self._post(
             self._format_url(card_id="verification"), json=card._as_dict()
         )
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](card._as_dict(), response,
+                               self._format_url(card_id="verification"))
+
         return response.get("status") == "VERIFIED"
 
-    def create(self, card: Card) -> NewCardResponse:
+    def create(self, card: Card, **kwargs) -> NewCardResponse:
         """Store the card in the safe
 
         Args:
             card (Card): Customer card data
         """
         response = self._post(self._format_url(), json=card._as_dict())
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](card._as_dict(), response, self._format_url())
+
         return NewCardResponse(**response)
 
     def all(self, customer_id: str, status: Status = Status.ALL) -> List[CardResponse]:
@@ -66,20 +77,32 @@ class Service(BaseService):
             response.get("total", len(cards)),
         )
 
-    def get(self, card_id: Union[CardToken, uuid.UUID, str]) -> CardResponse:
+    def get(self, card_id: Union[CardToken, uuid.UUID, str], **kwargs) -> CardResponse:
         """Return the data of an saved card on the safe
 
         Args:
             card_id: Unique card identify on Getnet Plataform
         """
         response = self._get(self._format_url(card_id=str(card_id)))
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](
+                None, response, self._format_url(card_id=str(card_id)))
+
         return CardResponse(**response)
 
-    def delete(self, card_id: Union[CardToken, uuid.UUID, str]) -> bool:
+    def delete(self, card_id: Union[CardToken, uuid.UUID, str], **kwargs) -> bool:
         """Remove an card saved on safe
 
         Args:
             card_id: Unique card identify on Getnet Plataform
         """
         self._delete(self._format_url(card_id=str(card_id)))
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](
+                None, response, self._format_url(card_id=str(card_id)))
+
         return True

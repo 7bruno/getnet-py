@@ -12,12 +12,19 @@ DOCUMENT_NUMBER_REGEX = re.compile(r"\A\d{11,15}\Z")
 class Service(BaseService):
     path = "/v1/customers/{customer_id}"
 
-    def create(self, customer: Customer, return_if_exists: bool = True) -> Customer:
+    def create(self, customer: Customer, return_if_exists: bool = True, **kwargs) -> Customer:
         customer.seller_id = self._client.seller_id
 
         try:
             response = self._post(self._format_url(), json=customer.as_dict())
+
+            if "callback" in kwargs.keys():
+
+                kwargs["callback"](customer.as_dict(),
+                                   response, self._format_url())
+
             return CustomerResponse(**response)
+
         except RequestError as err:
             if return_if_exists and err.error_code == "400":
                 return self.get(customer.customer_id)
@@ -59,10 +66,15 @@ class Service(BaseService):
         ]
 
         return ResponseList(
-            values, response.get("page"), response.get("limit"), response.get("total")
+            values, response.get("page"), response.get(
+                "limit"), response.get("total")
         )
 
-    def get(self, customer_id: str):
+    def get(self, customer_id: str, **kwargs):
         response = self._get(self._format_url(customer_id=customer_id))
+
+        if "callback" in kwargs.keys():
+
+            kwargs["callback"](None, response, self._format_url())
 
         return CustomerResponse(**response)
